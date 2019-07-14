@@ -32,6 +32,7 @@ resource "azurerm_public_ip" "public_ip" {
   name                = "${var.prefix}-TFPIP"
   location            = "${azurerm_resource_group.AzureVMRG.location}"
   resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
+  allocation_method   = "Dynamic"
   tags = {
     Deployed = "Terrraform"
   }
