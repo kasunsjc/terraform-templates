@@ -22,9 +22,18 @@ resource "azurerm_virtual_network" "VMvnet" {
 }
 
 resource "azurerm_subnet" "VMvnet_subnet" {
-  name = "${var.subnet_name}"
-  address_prefix = "${var.subnet_cidr}"
-  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
+  name                 = "${var.subnet_name}"
+  address_prefix       = "${var.subnet_cidr}"
+  resource_group_name  = "${azurerm_resource_group.AzureVMRG.name}"
   virtual_network_name = "${azurerm_virtual_network.VMvnet.name}"
 }
 
+resource "azurerm_public_ip" "public_ip" {
+  name                = "${var.prefix}-TFPIP"
+  location            = "${azurerm_resource_group.AzureVMRG.location}"
+  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
+  tags = {
+    Deployed = "Terrraform"
+  }
+
+}

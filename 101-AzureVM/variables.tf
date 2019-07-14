@@ -37,4 +37,12 @@ variable "subnet_cidr" {
   description = "Address Space for the Subnet"
 }
 
+variable "prefix" {
+  type        = "string"
+  default     = "vm"
+  description = "Address Space for the Subnet"
+
+}
+
+
 
