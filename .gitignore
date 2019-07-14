@@ -1,0 +1,6 @@
+.envrc
+.DS_Store
+.terraform
+*.tfstate
+*.tfstate.backup
+tags
