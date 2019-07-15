@@ -44,5 +44,40 @@ variable "prefix" {
 
 }
 
+variable "vmname" {
+  default = "Ubuntu-VM"
+}
+
+
+variable "publisher" {
+  default = "Canonical"
+}
+
+variable "offer" {
+  default = "UbuntuServer"
+}
+
+variable "sku" {
+  default = "16.04-LTS"
+}
+
+variable "osversion" {
+  default = "latest"
+}
+
+variable "vmsize" {
+  default = "Standard_DS1_v2"
+}
+
+variable "adminpassword" {
+  default = "Test@123"
+}
+
+variable "computerName" {
+  default = "SimpleVM"
+}
+
+
+
 
 
