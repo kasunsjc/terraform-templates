@@ -1,7 +1,0 @@
-rg-name      = "SimpleTFVM"
-location     = "Southeast Asia"
-network_name = "simplevm-vnet"
-vnet_cidr    = "10.100.0.0/16"
-subnet_name  = "server-subnet"
-subnet_cidr = "10.100.10.0/24"
-prefix = "vm"
