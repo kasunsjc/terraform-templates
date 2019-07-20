@@ -1,1 +1,5 @@
-# Terraform-Azure
+# Terraform
+
+##Azure
+##AWS
+##GCP
