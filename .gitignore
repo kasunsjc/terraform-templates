@@ -4,3 +4,4 @@
 *.tfstate
 *.tfstate.backup
 tags
+TestFolder/
