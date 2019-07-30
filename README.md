@@ -17,11 +17,10 @@ You need to have following tools need to be installed in local enviornment
 * [GCP Account](https://cloud.google.com/free/)
 * [Terraform Binaries](https://www.terraform.io/downloads.html)
 
-
 ## Authors
 
 * **Kasun Rajapakse** - [allaboutwindowssl](http://www.allaboutwindowssl.com/)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License
