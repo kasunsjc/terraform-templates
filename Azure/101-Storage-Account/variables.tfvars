@@ -1,0 +1,7 @@
+storage_account_name = "Cloudlifekasun"
+rg_name = "Storage-Account"
+account_tier = "Standard"
+account_kind = "StorageV2"
+replication_type = "GRS"
+location = "Southeast Asia"
+access_tier = "Hot"
