@@ -1,7 +1,7 @@
 #Provider
 /*
 *Author - Kasun Rajapakse
-*Subject - Azure Recovery Vault 
+*Subject - Enable vNet Peering
 *Language - HCL 
 ! Last Modify Date - Sep 7 2019
 ! Disclaimer- EGAL DISCLAIMER
