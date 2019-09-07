@@ -1,6 +1,6 @@
 /*
 *Author - Kasun Rajapakse
-*Subject - Azure Recovery Vault 
+*Subject -  Create Azure Recovery Vault 
 *Language - HCL 
 ! Last Modify Date - Sep 7 2019
 ! Disclaimer- EGAL DISCLAIMER
@@ -19,21 +19,24 @@ against any claims or lawsuits, including attorneys’ fees, that arise or resul
 from the use or distribution of the Sample Code. 
 */
 
+#provider
+
 provider "azurerm" {
+  
 }
-resource "azurerm_resource_group" "storage-rg" {
-  name = "${var.rg_name}"
+
+#Create Resource Group
+resource "azurerm_resource_group" "recovery-vault-rg" {
+  name = "${var.vault_rg_name}"
   location = "${var.location}"
 }
-resource "azurerm_storage_account" "storage-account" {
-  name = "${lower(var.storage_account_name)}"
-  resource_group_name = "${azurerm_resource_group.storage-rg.name}"
-  account_kind = "${var.account_kind}"
-  access_tier = "${var.access_tier}"
-  account_tier = "${var.account_tier}"
-  account_replication_type = "${var.replication_type}"
-  location = "${azurerm_resource_group.storage-rg.location}"
-  tags ={
-    env = "staging"
-  }
+
+
+#Azure Recovery Service Vault
+resource "azurerm_recovery_services_vault" "vm-backup-vault" {
+  name = "${var.vault_name}"
+  location = "${azurerm_resource_group.recovery-vault-rg.location}"
+  sku = "${var.sku}"
+  resource_group_name = "${azurerm_resource_group.recovery-vault-rg.name}"
+
 }

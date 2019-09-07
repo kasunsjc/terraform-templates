@@ -1,7 +1,6 @@
-
 /*
 *Author - Kasun Rajapakse
-*Subject - Azure Recovery Vault 
+*Subject -  Create Azure Recovery Vault 
 *Language - HCL 
 ! Last Modify Date - Sep 7 2019
 ! Disclaimer- EGAL DISCLAIMER
@@ -20,43 +19,62 @@ against any claims or lawsuits, including attorneys’ fees, that arise or resul
 from the use or distribution of the Sample Code. 
 */
 
-#Inetializing Provider
+#provider
 
 provider "azurerm" {
-  
+
 }
 
-#Access the Existing Resources in Azure
-data "azurerm_resource_group" "key-vault-rg" {
-  name = "${var.key_vault_rg}"
-}
-
-data "azurerm_key_vault" "secret-vault" {
-  name = "${var.key_vault_name}"
-  resource_group_name = "${data.azurerm_resource_group.key-vault-rg.name}"
-}
-
-data "azurerm_key_vault_secret" "admin-password" {
-  name = "${var.secret_name}"
-  vault_uri = "${data.azurerm_key_vault.secret-vault.vault_uri}"
-}
-
-
-
-
-#Create Azure Resource Group
-resource "azurerm_resource_group" "AzureVMRG" {
-  name     = "${var.rg_name}"
+#Create Resource Group
+resource "azurerm_resource_group" "recovery-vault-rg" {
+  name     = "${var.vault_rg_name}"
   location = "${var.location}"
-
-  tags = {
-    Deployed = "Terrraform"
-  }
 }
 
+
+#Azure Recovery Service Vault
+resource "azurerm_recovery_services_vault" "vm-backup-vault" {
+  name                = "${var.vault_name}"
+  location            = "${azurerm_resource_group.recovery-vault-rg.location}"
+  sku                 = "${var.sku}"
+  resource_group_name = "${azurerm_resource_group.recovery-vault-rg.name}"
+
+}
+#Create Backup Policy 
+
+resource "azurerm_recovery_services_protection_policy_vm" "daily-policy" {
+  name                = "${var.vm_backup_policy_name}"
+  resource_group_name = "${azurerm_resource_group.recovery-vault-rg.name}"
+  recovery_vault_name = "${azurerm_recovery_services_vault.vm-backup-vault.name}"
+
+  backup {
+    frequency = "Daily"
+    time      = "23:00"
+  }
+  retention_daily {
+    count = 10
+  }
+
+  retention_weekly {
+    count    = 42
+    weekdays = ["Sunday", "Wednesday", "Friday", "Saturday"]
+  }
+
+
+}
+
+resource "azurerm_recovery_services_protected_vm" "vm1" {
+  resource_group_name = "${azurerm_resource_group.recovery-vault-rg.name}"
+  recovery_vault_name = "${azurerm_recovery_services_vault.vm-backup-vault.name}"
+  source_vm_id        = "${azurerm_virtual_machine.vm.id}"
+  backup_policy_id    = "${azurerm_recovery_services_protection_policy_vm.daily-policy.id}"
+
+}
+
+#Create vNet
 resource "azurerm_virtual_network" "VMvnet" {
-  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
-  location            = "${azurerm_resource_group.AzureVMRG.location}"
+  resource_group_name = "${azurerm_resource_group.recovery-vault-rg.name}"
+  location            = "${azurerm_resource_group.recovery-vault-rg.location}"
   address_space       = ["${var.vnet_cidr}"]
   name                = "${var.network_name}"
   tags = {
@@ -64,17 +82,19 @@ resource "azurerm_virtual_network" "VMvnet" {
   }
 }
 
+#Create Subnet
 resource "azurerm_subnet" "VMvnet_subnet" {
   name                 = "${var.subnet_name}"
   address_prefix       = "${var.subnet_cidr}"
-  resource_group_name  = "${azurerm_resource_group.AzureVMRG.name}"
+  resource_group_name  = "${azurerm_resource_group.recovery-vault-rg.name}"
   virtual_network_name = "${azurerm_virtual_network.VMvnet.name}"
 }
 
+#Create Public IP
 resource "azurerm_public_ip" "public_ip" {
   name                = "${var.prefix}-TFPIP"
-  location            = "${azurerm_resource_group.AzureVMRG.location}"
-  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
+  location            = "${azurerm_resource_group.recovery-vault-rg.location}"
+  resource_group_name = "${azurerm_resource_group.recovery-vault-rg.name}"
   allocation_method   = "Dynamic"
   tags = {
     Deployed = "Terrraform"
@@ -82,10 +102,11 @@ resource "azurerm_public_ip" "public_ip" {
 
 }
 
+#Create NSG
 resource "azurerm_network_security_group" "nsg" {
   name                = "${var.prefix}-NSG"
-  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
-  location            = "${azurerm_resource_group.AzureVMRG.location}"
+  resource_group_name = "${azurerm_resource_group.recovery-vault-rg.name}"
+  location            = "${azurerm_resource_group.recovery-vault-rg.location}"
   tags = {
     Deployed = "Terrraform"
   }
@@ -103,10 +124,11 @@ resource "azurerm_network_security_group" "nsg" {
   }
 }
 
+#Create NIC
 resource "azurerm_network_interface" "nic" {
   name                      = "${var.prefix}-nic"
-  location                  = "${azurerm_resource_group.AzureVMRG.location}"
-  resource_group_name       = "${azurerm_resource_group.AzureVMRG.name}"
+  location                  = "${azurerm_resource_group.recovery-vault-rg.location}"
+  resource_group_name       = "${azurerm_resource_group.recovery-vault-rg.name}"
   network_security_group_id = "${azurerm_network_security_group.nsg.id}"
   tags = {
     Deployed = "Terrraform"
@@ -119,12 +141,13 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
+#Create VM
 resource "azurerm_virtual_machine" "vm" {
   name                             = "${var.vmname}"
   network_interface_ids            = ["${azurerm_network_interface.nic.id}"]
-  location                         = "${azurerm_resource_group.AzureVMRG.location}"
+  location                         = "${azurerm_resource_group.recovery-vault-rg.location}"
   vm_size                          = "${var.vmsize}"
-  resource_group_name              = "${azurerm_resource_group.AzureVMRG.name}"
+  resource_group_name              = "${azurerm_resource_group.recovery-vault-rg.name}"
   delete_data_disks_on_termination = true
 
   storage_os_disk {
@@ -137,25 +160,25 @@ resource "azurerm_virtual_machine" "vm" {
   storage_image_reference {
     publisher = "${var.publisher}"
     offer     = "${var.offer}"
-    sku       = "${var.sku}"
+    sku       = "${var.vm-sku}"
     version   = "${var.osversion}"
   }
 
   os_profile {
     computer_name  = "${var.computerName}"
     admin_username = "localadmin"
-    admin_password = "${data.azurerm_key_vault_secret.admin-password.value}" 
-    }
+    admin_password = "${var.adminpassword}"
+  }
 
-  os_profile_linux_config {
-    disable_password_authentication = false
+  os_profile_windows_config {
+    provision_vm_agent = true
   }
 }
 
 resource "azurerm_managed_disk" "datadisk" {
   name                 = "${var.vmname}-disk1"
-  location             = "${azurerm_resource_group.AzureVMRG.location}"
-  resource_group_name  = "${azurerm_resource_group.AzureVMRG.name}"
+  location             = "${azurerm_resource_group.recovery-vault-rg.location}"
+  resource_group_name  = "${azurerm_resource_group.recovery-vault-rg.name}"
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
   disk_size_gb         = 10
@@ -167,5 +190,4 @@ resource "azurerm_virtual_machine_data_disk_attachment" "datdiskattach" {
   lun                = "10"
   caching            = "ReadWrite"
 }
-
 
