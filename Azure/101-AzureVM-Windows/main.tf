@@ -1,6 +1,6 @@
 /*
 *Author - Kasun Rajapakse
-*Subject - Azure Recovery Vault 
+*Subject - Create Windows VM
 *Language - HCL 
 ! Last Modify Date - Sep 7 2019
 ! Disclaimer- EGAL DISCLAIMER
