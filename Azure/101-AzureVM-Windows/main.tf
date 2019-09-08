@@ -3,7 +3,7 @@
 *Subject - Create Windows VM
 *Language - HCL 
 ! Last Modify Date - Sep 7 2019
-! Disclaimer- EGAL DISCLAIMER
+! Disclaimer- LEGAL DISCLAIMER
 This Sample Code is provided for the purpose of illustration only and is not
 intended to be used in a production environment.  THIS SAMPLE CODE AND ANY
 RELATED INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
@@ -69,13 +69,13 @@ resource "azurerm_network_security_group" "nsg" {
   }
 
   security_rule {
-    name                       = "SSH"
+    name                       = "RDP"
     priority                   = 1000
     direction                  = "inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "22"
+    destination_port_range     = "3389"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
