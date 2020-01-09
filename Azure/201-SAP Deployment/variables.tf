@@ -1,13 +1,11 @@
-variable "client_secret" {
-  type = string
+#variables 
+
+variable "resourceGroup_name"{
+    type = "string"
+    default = "sap-test-rg"
 }
 
-variable "region" {
-  type    = string
-  default = "westus2"
-}
-
-variable "namespace" {
-  type    = string
-  default = "ballroominaction"
+variable "location"{
+    type = "string"
+    default = "westeurope"
 }
