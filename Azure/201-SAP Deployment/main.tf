@@ -1,7 +1,4 @@
-resource "azurerm_resource_group" "default" {
-  name     = var.namespace
-  location = var.region
-}
+#Create Resource Group 
 
 resource "azurerm_resource_group" "sap-deploy-rg" {
   name = var.resourceGroup_name
