@@ -27,24 +27,38 @@ resource "azurerm_virtual_network" "sap-vnet" {
     env = "dev"
     App = "SAP"
   }
+}
 
-  subnet {
-    name           = var.mgt_subnet
-    address_prefix = "${var.mgt_subnet_prefix}"
-    security_group = azurerm_network_security_group.nsg-mgt.id
-  }
+resource "azurerm_subnet" "mgt-subnet" {
+  name                 = var.mgt_subnet
+  resource_group_name  = azurerm_resource_group.sap-deploy-rg.name
+  virtual_network_name = azurerm_virtual_network.sap-vnet.name
+  address_prefix       = var.mgt_subnet_prefix
 
-  subnet {
-    name           = var.app_subnet
-    address_prefix = "${var.app_subnet_prefix}"
-    security_group = azurerm_network_security_group.nsg-app.id
-  }
+}
 
-  subnet {
-    name           = var.db_subnet
-    address_prefix = "${var.db_subnet_prefix}"
-    security_group = azurerm_network_security_group.nsg-db.id
-  }
+resource "azurerm_subnet" "front-subnet" {
+  name                 = var.front_subnet
+  resource_group_name  = azurerm_resource_group.sap-deploy-rg.name
+  virtual_network_name = azurerm_virtual_network.sap-vnet.name
+  address_prefix       = var.front_subnet_prefix
+
+}
+
+resource "azurerm_subnet" "app-subnet" {
+  name                 = var.app_subnet
+  resource_group_name  = azurerm_resource_group.sap-deploy-rg.name
+  virtual_network_name = azurerm_virtual_network.sap-vnet.name
+  address_prefix       = var.app_subnet_prefix
+
+}
+
+resource "azurerm_subnet" "db-subnet" {
+  name                 = var.db_subnet
+  resource_group_name  = azurerm_resource_group.sap-deploy-rg.name
+  virtual_network_name = azurerm_virtual_network.sap-vnet.name
+  address_prefix       = var.db_subnet_prefix
+
 }
 
 #Create NSGs
@@ -102,6 +116,26 @@ resource "azurerm_network_security_group" "nsg-mgt" {
 
 }
 
+resource "azurerm_network_security_group" "nsg-front" {
+  name                = var.front_nsg
+  location            = azurerm_resource_group.sap-deploy-rg.location
+  resource_group_name = azurerm_resource_group.sap-deploy-rg.name
+
+  security_rule {
+    name                       = "INB-HTTP-Allow"
+    description                = "Allow HTTP traffic from Public"
+    priority                   = 1000
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "80"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+
 resource "azurerm_network_security_group" "nsg-app" {
   name                = var.app_nsg
   location            = azurerm_resource_group.sap-deploy-rg.location
@@ -140,12 +174,24 @@ resource "azurerm_network_security_group" "nsg-db" {
   }
 }
 
-#Create VMs
 
-resource "azurerm_network_interface" "vm-nic"{
-  name = var.sap_front_vm-nic
-  location = azurerm_resource_group.sap-deploy-rg.location
+###################Create VMs#################################################
+
+#Front Server
+
+resource "azurerm_network_interface" "front-vm-nic" {
+  name                = "${var.sap_front_vm}-nic"
+  location            = azurerm_resource_group.sap-deploy-rg.location
   resource_group_name = azurerm_resource_group.sap-deploy-rg.name
+  ip_configuration {
+    name                          = "ipconfig1"
+    private_ip_address_version    = "IPv4"
+    subnet_id                     = azurerm_subnet.app-subnet.id
+    primary                       = true
+    private_ip_address_allocation = "static"
+    private_ip_address = "10.10.15.7"
+
+  }
 }
 
 resource "azurerm_virtual_machine" "front-app" {
@@ -153,7 +199,7 @@ resource "azurerm_virtual_machine" "front-app" {
   location            = azurerm_resource_group.sap-deploy-rg.location
   resource_group_name = azurerm_resource_group.sap-deploy-rg.name
   vm_size = var.vm_size
-  network_interface_ids = 
+  network_interface_ids = azurerm_network_interface.front-vm-nic.id
   storage_os_disk {
     name              = var.sap_front_vm-OSdisk
     caching           = "ReadWrite"
@@ -162,19 +208,20 @@ resource "azurerm_virtual_machine" "front-app" {
   }
 
   storage_image_reference {
-    publisher = "${var.publisher}"
-    offer     = "${var.offer}"
-    sku       = "${var.sku}"
-    version   = "${var.osversion}"
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
   }
 
   os_profile {
-    computer_name  = "${var.computerName}"
-    admin_username = "localadmin"
-    admin_password = "${var.adminpassword}"
+    computer_name  = var.sap_front_vm
+    admin_username = var.admin_username
+    admin_password = var.adminpassword
   }
 
   os_profile_windows_config {
     provision_vm_agent = true
   }
 }
+

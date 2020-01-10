@@ -34,6 +34,10 @@ variable "db_subnet"{
     type = string
     default = "db-subnet"
 }
+variable "front_subnet"{
+    type = string
+    default = "front-subnet"
+}
 
 variable "mgt_subnet_prefix"{
     type = string
@@ -49,9 +53,18 @@ variable "db_subnet_prefix"{
     type = string
     default = "10.10.16.0/24"
 }
+variable "front_subnet_prefix"{
+    type = string
+    default = "10.10.14.0/24"
+}
+
 variable "mgt_nsg"{
     type = string
     default = "sap-mgt-nsg"
+}
+variable "front_nsg"{
+    type = string
+    default = "sap-front-nsg"
 }
 variable "app_nsg"{
     type = string
@@ -67,5 +80,12 @@ variable "sap_front_vm"{
 }
 variable "vm_size"{
     type = string
-    default = "CORP-SAP-DEV-VM"
+    default = "Standard_B8ms"
+}
+variable "admin_password"{
+
+}
+variable "admin_username"{
+    type = string
+    default = "sapadmin"
 }
