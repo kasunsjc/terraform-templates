@@ -177,7 +177,7 @@ resource "azurerm_network_security_group" "nsg-db" {
 
 ###################Create VMs#################################################
 
-#Front Server
+######Front Server###############################
 
 resource "azurerm_network_interface" "front-vm-nic" {
   name                = "${var.sap_front_vm}-nic"
@@ -186,22 +186,22 @@ resource "azurerm_network_interface" "front-vm-nic" {
   ip_configuration {
     name                          = "ipconfig1"
     private_ip_address_version    = "IPv4"
-    subnet_id                     = azurerm_subnet.app-subnet.id
+    subnet_id                     = azurerm_subnet.front-subnet.id
     primary                       = true
     private_ip_address_allocation = "static"
-    private_ip_address = "10.10.15.7"
+    private_ip_address            = "10.10.14.7"
 
   }
 }
 
-resource "azurerm_virtual_machine" "front-app" {
-  name                = var.sap_front_vm
-  location            = azurerm_resource_group.sap-deploy-rg.location
-  resource_group_name = azurerm_resource_group.sap-deploy-rg.name
-  vm_size = var.vm_size
-  network_interface_ids = azurerm_network_interface.front-vm-nic.id
+resource "azurerm_virtual_machine" "front-vm" {
+  name                  = var.sap_front_vm
+  location              = azurerm_resource_group.sap-deploy-rg.location
+  resource_group_name   = azurerm_resource_group.sap-deploy-rg.name
+  vm_size               = var.vm_size
+  network_interface_ids = ["${azurerm_network_interface.front-vm-nic.id}"]
   storage_os_disk {
-    name              = var.sap_front_vm-OSdisk
+    name              = "${var.sap_front_vm}-osdisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
@@ -217,11 +217,59 @@ resource "azurerm_virtual_machine" "front-app" {
   os_profile {
     computer_name  = var.sap_front_vm
     admin_username = var.admin_username
-    admin_password = var.adminpassword
+    admin_password = var.admin_password
   }
 
   os_profile_windows_config {
     provision_vm_agent = true
   }
 }
+###############End of Front Server #############################
 
+################ SAP-APP Server ################################
+
+resource "azurerm_network_interface" "app-vm-nic" {
+  name                = "${var.sap_app_vm}-nic"
+  location            = azurerm_resource_group.sap-deploy-rg.location
+  resource_group_name = azurerm_resource_group.sap-deploy-rg.name
+  ip_configuration {
+    name                          = "ipconfig1"
+    private_ip_address_version    = "IPv4"
+    subnet_id                     = azurerm_subnet.app-subnet.id
+    primary                       = true
+    private_ip_address_allocation = "static"
+    private_ip_address            = "10.10.15.7"
+
+  }
+}
+
+resource "azurerm_virtual_machine" "app-vm" {
+  name                  = var.sap_app_vm
+  location              = azurerm_resource_group.sap-deploy-rg.location
+  resource_group_name   = azurerm_resource_group.sap-deploy-rg.name
+  vm_size               = var.vm_size
+  network_interface_ids = ["${azurerm_network_interface.front-vm-nic.id}"]
+  storage_os_disk {
+    name              = "${var.sap_app_vm}-osdisk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  storage_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
+  }
+
+  os_profile {
+    computer_name  = var.sap_front_vm
+    admin_username = var.admin_username
+    admin_password = var.admin_password
+  }
+
+  os_profile_windows_config {
+    provision_vm_agent = true
+  }
+}

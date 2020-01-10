@@ -78,6 +78,11 @@ variable "sap_front_vm"{
     type = string 
     default = "CORP-AZ-FRONT"
 }
+variable "sap_app_vm"{
+    type = string 
+    default = "CORP-AZ-APP"
+}
+
 variable "vm_size"{
     type = string
     default = "Standard_B8ms"
