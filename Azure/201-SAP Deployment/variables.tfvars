@@ -1,2 +1,5 @@
 location="westeurope"
-resourceGroup_name="sap-test-rg"
+resourceGroup_name="RG-SAP-Dev"
+vnet_name= "sap-dev-vnet"
+vnet_address_space = "10.10.0.0/16"
+sap_front_vm= "CORP-AZ-FRONT"
