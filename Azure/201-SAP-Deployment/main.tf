@@ -175,9 +175,9 @@ resource "azurerm_network_security_group" "nsg-db" {
 }
 
 
-###################Create VMs#################################################
+#-----------------------Create VMs----------------------------#
 
-######Front Server###############################
+#----------------------Front Server----------------------------#
 
 resource "azurerm_network_interface" "front-vm-nic" {
   name                = "${var.sap_front_vm}-nic"
@@ -224,9 +224,9 @@ resource "azurerm_virtual_machine" "front-vm" {
     provision_vm_agent = true
   }
 }
-###############End of Front Server #############################
+#--------------End of Front Server -------------------------------#
 
-################ SAP-APP Server ################################
+#----------------- SAP-APP Server --------------------------------#
 
 resource "azurerm_network_interface" "app-vm-nic" {
   name                = "${var.sap_app_vm}-nic"
@@ -248,7 +248,7 @@ resource "azurerm_virtual_machine" "app-vm" {
   location              = azurerm_resource_group.sap-deploy-rg.location
   resource_group_name   = azurerm_resource_group.sap-deploy-rg.name
   vm_size               = var.vm_size
-  network_interface_ids = ["${azurerm_network_interface.front-vm-nic.id}"]
+  network_interface_ids = ["${azurerm_network_interface.app-vm-nic.id}"]
   storage_os_disk {
     name              = "${var.sap_app_vm}-osdisk"
     caching           = "ReadWrite"
