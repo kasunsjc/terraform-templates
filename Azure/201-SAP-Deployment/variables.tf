@@ -91,6 +91,11 @@ variable "sap_hana_vm"{
     default = "CORP-AZ-HANA"
 }
 
+variable "jumpbox_vm"{
+    type = string 
+    default = "CORP-AZ-JUMPBOX"
+}
+
 variable "vm_size"{
     type = string
     default = "Standard_B8ms"
@@ -99,7 +104,6 @@ variable "hana_vm_size"{
     type = string
     default = "Standard_B8ms"
 }
-
 
 variable "admin_password"{
 
