@@ -1,8 +1,9 @@
+
 /*
 *Author - Kasun Rajapakse
-*Subject - Create Windows VM
+*Subject - Enable Update Management Windows VM
 *Language - HCL 
-! Last Modify Date - Sep 7 2019
+! Last Modify Date - Oct 22 2019
 ! Disclaimer- LEGAL DISCLAIMER
 This Sample Code is provided for the purpose of illustration only and is not
 intended to be used in a production environment.  THIS SAMPLE CODE AND ANY
@@ -19,11 +20,13 @@ against any claims or lawsuits, including attorneys’ fees, that arise or resul
 from the use or distribution of the Sample Code. 
 */
 
+#Inetializing Provider
+
 provider "azurerm" {
-  version = "=1.44.0"
+
 }
 
-resource "azurerm_resource_group" "AzureVMRG" {
+resource "azurerm_resource_group" "VMUpdateMgt" {
   name     = "${var.rg-name}"
   location = "${var.location}"
 
@@ -33,8 +36,8 @@ resource "azurerm_resource_group" "AzureVMRG" {
 }
 
 resource "azurerm_virtual_network" "VMvnet" {
-  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
-  location            = "${azurerm_resource_group.AzureVMRG.location}"
+  resource_group_name = "${azurerm_resource_group.VMUpdateMgt.name}"
+  location            = "${azurerm_resource_group.VMUpdateMgt.location}"
   address_space       = ["${var.vnet_cidr}"]
   name                = "${var.network_name}"
   tags = {
@@ -45,14 +48,14 @@ resource "azurerm_virtual_network" "VMvnet" {
 resource "azurerm_subnet" "VMvnet_subnet" {
   name                 = "${var.subnet_name}"
   address_prefix       = "${var.subnet_cidr}"
-  resource_group_name  = "${azurerm_resource_group.AzureVMRG.name}"
+  resource_group_name  = "${azurerm_resource_group.VMUpdateMgt.name}"
   virtual_network_name = "${azurerm_virtual_network.VMvnet.name}"
 }
 
 resource "azurerm_public_ip" "public_ip" {
   name                = "${var.prefix}-TFPIP"
-  location            = "${azurerm_resource_group.AzureVMRG.location}"
-  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
+  location            = "${azurerm_resource_group.VMUpdateMgt.location}"
+  resource_group_name = "${azurerm_resource_group.VMUpdateMgt.name}"
   allocation_method   = "Dynamic"
   tags = {
     Deployed = "Terrraform"
@@ -62,8 +65,8 @@ resource "azurerm_public_ip" "public_ip" {
 
 resource "azurerm_network_security_group" "nsg" {
   name                = "${var.prefix}-NSG"
-  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
-  location            = "${azurerm_resource_group.AzureVMRG.location}"
+  resource_group_name = "${azurerm_resource_group.VMUpdateMgt.name}"
+  location            = "${azurerm_resource_group.VMUpdateMgt.location}"
   tags = {
     Deployed = "Terrraform"
   }
@@ -83,8 +86,8 @@ resource "azurerm_network_security_group" "nsg" {
 
 resource "azurerm_network_interface" "nic" {
   name                      = "${var.prefix}-nic"
-  location                  = "${azurerm_resource_group.AzureVMRG.location}"
-  resource_group_name       = "${azurerm_resource_group.AzureVMRG.name}"
+  location                  = "${azurerm_resource_group.VMUpdateMgt.location}"
+  resource_group_name       = "${azurerm_resource_group.VMUpdateMgt.name}"
   network_security_group_id = "${azurerm_network_security_group.nsg.id}"
   tags = {
     Deployed = "Terrraform"
@@ -100,9 +103,9 @@ resource "azurerm_network_interface" "nic" {
 resource "azurerm_virtual_machine" "vm" {
   name                             = "${var.vmname}"
   network_interface_ids            = ["${azurerm_network_interface.nic.id}"]
-  location                         = "${azurerm_resource_group.AzureVMRG.location}"
+  location                         = "${azurerm_resource_group.VMUpdateMgt.location}"
   vm_size                          = "${var.vmsize}"
-  resource_group_name              = "${azurerm_resource_group.AzureVMRG.name}"
+  resource_group_name              = "${azurerm_resource_group.VMUpdateMgt.name}"
   delete_data_disks_on_termination = true
 
   storage_os_disk {
@@ -122,18 +125,19 @@ resource "azurerm_virtual_machine" "vm" {
   os_profile {
     computer_name  = "${var.computerName}"
     admin_username = "localadmin"
-    admin_password = "${var.adminpassword}" 
-    }
+    admin_password = "${var.adminpassword}"
+  }
 
   os_profile_windows_config {
-    provision_vm_agent = true
+    provision_vm_agent        = true
+    enable_automatic_upgrades = false
   }
 }
 
 resource "azurerm_managed_disk" "datadisk" {
   name                 = "${var.vmname}-disk1"
-  location             = "${azurerm_resource_group.AzureVMRG.location}"
-  resource_group_name  = "${azurerm_resource_group.AzureVMRG.name}"
+  location             = "${azurerm_resource_group.VMUpdateMgt.location}"
+  resource_group_name  = "${azurerm_resource_group.VMUpdateMgt.name}"
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
   disk_size_gb         = 10
@@ -145,4 +149,13 @@ resource "azurerm_virtual_machine_data_disk_attachment" "datdiskattach" {
   lun                = "10"
   caching            = "ReadWrite"
 }
+
+#-------------------OMS Workspace----------------------------------#
+resource "azurerm_log_analytics_workspace" "name" {
+  location            = "${azurerm_resource_group.VMUpdateMgt.location}"
+  resource_group_name = "${azurerm_resource_group.VMUpdateMgt.name}"
+  name                = "${var.logAnlyticsWorkspaceName}"
+  sku                 = "${var.logAnlyticsWorkspace_sku}"
+}
+
 

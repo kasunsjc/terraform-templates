@@ -1,8 +1,8 @@
 /*
 *Author - Kasun Rajapakse
-*Subject - Create Windows VM
+*Subject -  Enable Update Management for VMs
 *Language - HCL 
-! Last Modify Date - Sep 7 2019
+! Last Modify Date - Nov 10 2019
 ! Disclaimer- LEGAL DISCLAIMER
 This Sample Code is provided for the purpose of illustration only and is not
 intended to be used in a production environment.  THIS SAMPLE CODE AND ANY
@@ -20,7 +20,7 @@ from the use or distribution of the Sample Code.
 */
 
 provider "azurerm" {
-  version = "=1.44.0"
+
 }
 
 resource "azurerm_resource_group" "AzureVMRG" {
@@ -122,27 +122,52 @@ resource "azurerm_virtual_machine" "vm" {
   os_profile {
     computer_name  = "${var.computerName}"
     admin_username = "localadmin"
-    admin_password = "${var.adminpassword}" 
-    }
+    admin_password = "${var.adminpassword}"
+  }
 
   os_profile_windows_config {
     provision_vm_agent = true
   }
 }
 
-resource "azurerm_managed_disk" "datadisk" {
-  name                 = "${var.vmname}-disk1"
-  location             = "${azurerm_resource_group.AzureVMRG.location}"
-  resource_group_name  = "${azurerm_resource_group.AzureVMRG.name}"
-  storage_account_type = "Standard_LRS"
-  create_option        = "Empty"
-  disk_size_gb         = 10
+#Automation Account 
+resource "azurerm_automation_account" "auto-account" {
+  name                = "${azurerm_virtual_machine.vm.name}-auto-account"
+  location            = "${azurerm_resource_group.AzureVMRG.location}"
+  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
+  sku_name            = "Basic"
 }
 
-resource "azurerm_virtual_machine_data_disk_attachment" "datdiskattach" {
-  managed_disk_id    = "${azurerm_managed_disk.datadisk.id}"
-  virtual_machine_id = "${azurerm_virtual_machine.vm.id}"
-  lun                = "10"
-  caching            = "ReadWrite"
+#Log Analytics Workspace
+resource "azurerm_log_analytics_workspace" "update-logs" {
+  name                = "${azurerm_virtual_machine.vm.name}-workspace"
+  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
+  location            = "${azurerm_resource_group.AzureVMRG.location}"
+  sku                 = "${var.logAnalytics_sku}"
 }
+
+#Link Log Analytics Workspace & Automation Account
+resource "azurerm_log_analytics_linked_service" "loganalytic-linked" {
+  resource_group_name = "${azurerm_resource_group.AzureVMRG.name}"
+  workspace_name      = "${azurerm_log_analytics_workspace.update-logs.name}"
+  resource_id         = "${azurerm_automation_account.auto-account.id}"
+  depends_on          = ["azurerm_log_analytics_workspace.update-logs"]
+}
+#Log Analytics Solution
+
+resource "azurerm_log_analytics_solution" "Update-mgt" {
+  solution_name         = "UpdateManagement"
+  location              = "${azurerm_resource_group.AzureVMRG.location}"
+  resource_group_name   = "${azurerm_resource_group.AzureVMRG.name}"
+  workspace_resource_id = "${azurerm_log_analytics_workspace.update-logs.id}"
+  workspace_name        = "${azurerm_log_analytics_workspace.update-logs.name}"
+  depends_on            = ["azurerm_log_analytics_workspace.update-logs"]
+
+
+  plan {
+    publisher = "Microsoft"
+    product   = "OMSGallery/UpdateManagement"
+  }
+}
+
 

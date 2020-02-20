@@ -1,6 +1,6 @@
 /*
 *Author - Kasun Rajapakse
-*Subject - Azure Recovery Vault 
+*Subject - Simple EC2 Instance
 *Language - HCL 
 ! Last Modify Date - Sep 7 2019
 ! Disclaimer- LEGAL DISCLAIMER
