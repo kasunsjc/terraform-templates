@@ -13,3 +13,8 @@ vmname = "windowsvm"
 vmsize = "Standard_DS1_v2"
 adminpassword = "Test@123"
 computerName = "SimpleVM"
+subscription_id=""
+client_id = ""
+client_secret= ""
+tenent_id = ""
+
