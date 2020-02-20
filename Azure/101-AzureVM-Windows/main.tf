@@ -20,7 +20,7 @@ from the use or distribution of the Sample Code.
 */
 
 provider "azurerm" {
-  
+  version = "=1.44.0"
 }
 
 resource "azurerm_resource_group" "AzureVMRG" {
