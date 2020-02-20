@@ -44,6 +44,14 @@ variable "prefix" {
 
 }
 
+variable "subscription_id"{}
+
+variable "client_id"{}
+
+variable "client_secret"{}
+
+variable "tenent_id"{}
+
 variable "vmname" {
 }
 

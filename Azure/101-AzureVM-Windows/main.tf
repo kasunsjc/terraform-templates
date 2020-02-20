@@ -21,6 +21,10 @@ from the use or distribution of the Sample Code.
 
 provider "azurerm" {
   version = "=1.44.0"
+  subscription_id = var.subscription_id
+  client_id       = var.client_id
+  client_secret   = var.client_secret
+  tenant_id       = var.tenent_id
 }
 
 resource "azurerm_resource_group" "AzureVMRG" {
