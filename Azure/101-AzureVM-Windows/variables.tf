@@ -1,3 +1,4 @@
+
 variable "rg-name" {
   type        = "string"
   default     = "SimpleTFVM"
@@ -44,6 +45,14 @@ variable "prefix" {
 
 }
 
+variable "subscription_id"{}
+
+variable "client_id"{}
+
+variable "client_secret"{}
+
+variable "tenent_id"{}
+
 variable "vmname" {
 }
 
@@ -76,3 +85,4 @@ variable "computerName" {
 
 
 
+>>>>>>> 2c1a5258b17a2a302ec3026d9c4d500ca98138c4
