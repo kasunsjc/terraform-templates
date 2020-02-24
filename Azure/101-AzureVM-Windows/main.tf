@@ -151,4 +151,3 @@ resource "azurerm_virtual_machine_data_disk_attachment" "datdiskattach" {
   caching            = "ReadWrite"
 }
 
->>>>>>> 2c1a5258b17a2a302ec3026d9c4d500ca98138c4
