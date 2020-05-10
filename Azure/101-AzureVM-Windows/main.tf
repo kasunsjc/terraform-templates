@@ -1,4 +1,3 @@
-
 /*
 *Author - Kasun Rajapakse
 *Subject - Create Windows VM
