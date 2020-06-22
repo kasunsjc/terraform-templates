@@ -48,7 +48,7 @@ resource "azurerm_virtual_network" "VMvnet" {
 
 resource "azurerm_subnet" "VMvnet_subnet" {
   name                 = "${var.subnet_name}"
-  address_prefix       = "${var.subnet_cidr}"
+  address_prefixes       = "${var.subnet_cidr}"
   resource_group_name  = "${azurerm_resource_group.AzureVMRG.name}"
   virtual_network_name = "${azurerm_virtual_network.VMvnet.name}"
 }
