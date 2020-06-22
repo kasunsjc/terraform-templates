@@ -80,6 +80,11 @@ resource "azurerm_kubernetes_cluster" "k8cluster" {
     tags ={
         Enviornment = "Development"
     }
+
+    default_node_pool {
+        name = "linux-pool"
+        vm_size = "Standard_B2ms"
+    }
 }
 
 #Outputs
