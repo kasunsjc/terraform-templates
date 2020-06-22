@@ -9,3 +9,4 @@ keys/
 .vscode
 .terraform.tfstate.lock.info
 .idea
+build
