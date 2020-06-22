@@ -20,6 +20,7 @@ from the use or distribution of the Sample Code.
 */
 
 provider "azurerm" {
+  features{}
 }
 resource "azurerm_resource_group" "storage-rg" {
   name = "${var.rg_name}"

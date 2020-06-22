@@ -12,7 +12,6 @@ variable "account_kind" {
   
 }
 
-
 variable "replication_type" {
 
 }
