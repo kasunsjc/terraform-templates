@@ -27,3 +27,5 @@ resource "azurerm_subnet" "backend_subnet" {
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes = [var.backend_subnet_cidr]
 }
+
+}
