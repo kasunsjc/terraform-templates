@@ -22,6 +22,7 @@ module "app_service" {
   sql_server_fqdn = module.sql_server.sql_server_fqdn
   sql_server_password = module.sql_server.sql_server_password
   sql_server_username = module.sql_server.sql_server_username
+  sqldb_edition = var.sqldb_edition
 }
 
 module "sql_server" {

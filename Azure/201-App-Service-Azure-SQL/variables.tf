@@ -59,3 +59,7 @@ variable "sqldb_name" {
   default = "divorce"
   description = "SQL Database name"
 }
+
+variable "sqldb_edition" {
+  description = "SQL DB edition (Standard, Primium)"
+}

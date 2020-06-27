@@ -20,3 +20,7 @@ variable "sql_master_password" {
 variable "sqldb_name" {
   description = "SQL Database name"
 }
+
+variable "sqldb_edition" {
+  description = "SQL DB edition (Standard, Primium)"
+}

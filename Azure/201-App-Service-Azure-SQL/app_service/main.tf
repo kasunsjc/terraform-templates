@@ -10,6 +10,11 @@ resource "azurerm_app_service_plan" "app_service_plan" {
     size = var.app_service_plan_sku
     tier = var.app_service_plan_size
   }
+
+  tags = {
+    env = Prod
+  }
+
 }
 
 resource "azurerm_app_service" "web_frontend" {
@@ -27,6 +32,11 @@ resource "azurerm_app_service" "web_frontend" {
       "hostingstart.html"
     ]
   }
+
+  tags = {
+    env = Prod
+  }
+
 }
 
 resource "azurerm_app_service" "api_app" {
@@ -48,4 +58,9 @@ resource "azurerm_app_service" "api_app" {
   app_settings = {
     "SqlConnectionString" = "Server=tcp:${var.sql_server_fqdn},1433;Initial Catalog=${var.sql_db_name};Persist Security Info=False;User ID=${var.sql_server_username};Password=${var.sql_server_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   }
+
+  tags = {
+    env = Prod
+  }
+
 }
