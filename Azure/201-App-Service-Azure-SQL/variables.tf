@@ -10,7 +10,7 @@ variable "rg_name" {
 
 #App Service Variables
 variable "app_service_plan_name" {
-  default = "app_service_test"
+  default = "app-service-test"
   description = "Name of the APp Service Plan"
 }
 
@@ -62,4 +62,19 @@ variable "sqldb_name" {
 
 variable "sqldb_edition" {
   description = "SQL DB edition (Standard, Primium)"
+}
+
+#Logging and monitoring Variables
+
+variable "log_analytics_workspace_name" {
+  description = "Log Analytics workspace name"
+}
+
+variable "log_analytics_sku" {
+  description = "SKU of the log analytics workspace"
+  default = "Free"
+}
+
+variable "app_insights" {
+  description = "Application insights"
 }

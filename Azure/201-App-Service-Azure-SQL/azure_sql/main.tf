@@ -1,6 +1,12 @@
 provider "azurerm" {
   features {}
 }
+resource "random_string" "random_suffix" {
+  length  = 5
+  special = false
+  number  = false
+  upper   = false
+}
 
 # Provision Azure SQL DB server instance
 resource "azurerm_sql_server" "webapp_sqlserver" {
@@ -12,28 +18,28 @@ resource "azurerm_sql_server" "webapp_sqlserver" {
   administrator_login_password = var.sql_master_password
 
   tags = {
-    env = Prod
+    env = "Prod"
   }
 }
 
 # Provision the Azure SQL Database (products database)
 resource "azurerm_sql_database" "webapp_sqldb" {
-  name                = "${var.sqldb_name}-sqldb"
-  location            = var.region
-  resource_group_name = var.rg_name
-  server_name         = azurerm_sql_server.webapp_sqlserver.name
-  edition             = var.sqldb_edition
+  name                             = "${var.sqldb_name}-sqldb"
+  location                         = var.region
+  resource_group_name              = var.rg_name
+  server_name                      = "${azurerm_sql_server.webapp_sqlserver.name}"
+  edition                          = var.sqldb_edition
   requested_service_objective_name = "S0"
 
   extended_auditing_policy {
-    storage_account_access_key = azurerm_storage_account.sql_auditing_sa.primary_access_key
-    storage_endpoint = azurerm_storage_account.sql_auditing_sa.primary_blob_endpoint
+    storage_account_access_key              = azurerm_storage_account.sql_auditing_sa.primary_access_key
+    storage_endpoint                        = azurerm_storage_account.sql_auditing_sa.primary_blob_endpoint
     storage_account_access_key_is_secondary = true
-    retention_in_days = 60
+    retention_in_days                       = 60
   }
 
   tags = {
-    env = Prod
+    env = "Prod"
   }
 
 }
@@ -47,14 +53,14 @@ resource "azurerm_sql_firewall_rule" "sql_svr_firewall" {
 }
 
 resource "azurerm_storage_account" "sql_auditing_sa" {
-  name                     = "${var.sql_svr_name}-audit-sa"
+  name                     = "sqlauditlog${random_string.random_suffix.result}"
   resource_group_name      = var.rg_name
   location                 = var.region
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
   tags = {
-    env = Prod
+    env = "Prod"
   }
 
 }

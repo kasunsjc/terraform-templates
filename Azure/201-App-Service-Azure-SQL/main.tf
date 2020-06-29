@@ -22,7 +22,6 @@ module "app_service" {
   sql_server_fqdn = module.sql_server.sql_server_fqdn
   sql_server_password = module.sql_server.sql_server_password
   sql_server_username = module.sql_server.sql_server_username
-  sqldb_edition = var.sqldb_edition
 }
 
 module "sql_server" {
@@ -33,5 +32,14 @@ module "sql_server" {
   sql_master_password = var.sql_master_password
   sql_master_username = var.sql_master_username
   sqldb_name = var.sqldb_name
+  sqldb_edition = var.sqldb_edition
 }
 
+module "monitoring_logging" {
+  source = "./logging-monitoring"
+  app_insights = var.app_insights
+  log_analytics_sku = var.log_analytics_sku
+  log_analytics_workspace_name = var.log_analytics_workspace_name
+  region = var.region
+  rg_name = azurerm_resource_group.rg_name.name
+}
