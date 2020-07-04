@@ -13,7 +13,6 @@ resource "azurerm_log_analytics_workspace" "web_app_loganalytics" {
   name                = var.log_analytics_workspace_name
   resource_group_name = var.rg_name
   sku                 = var.log_analytics_sku
-  retention_in_days   = "30"
 }
 
 resource "azurerm_application_insights" "web_app_app_insights" {
