@@ -41,7 +41,7 @@ variable "api_app_name" {
 
 #SQL Server Variables
 variable "sql_svr_name" {
-  default = "divorce"
+  default = "consultant"
   description = "SQL Server Name"
 }
 
@@ -56,7 +56,7 @@ variable "sql_master_password" {
 }
 
 variable "sqldb_name" {
-  default = "divorce"
+  default = "consultant"
   description = "SQL Database name"
 }
 
