@@ -2,7 +2,7 @@
 
 Terraform templates for Azure, AWS, GCP, Docker
 
-This Repo include the templates for Terraform. Templates are catogarized based on the complexity of the templates.
+This Repo includes the templates for Terraform. Templates are categorized based on the complexity of the templates.
 
 ## Getting Started
 
@@ -10,7 +10,7 @@ Use [Git clone](https://github.com/kasunsjc/Terraform.git) or download the code
 
 ### Prerequisites
 
-You need to have following tools need to be installed in local enviornment
+You need to have following tools need to be installed in local environment
 
 * [Azure Account](https://azure.microsoft.com/en-us/free/)
 * [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
@@ -24,7 +24,7 @@ You need to have following tools need to be installed in local enviornment
 
 ## Authors
 
-* **Kasun Rajapakse** - [allaboutwindowssl](http://www.allaboutwindowssl.com/)
+* **Kasun Rajapakse** - [Kasun Rajapakse](http://kasunrajapakse.me/)
 
 ## License
 
